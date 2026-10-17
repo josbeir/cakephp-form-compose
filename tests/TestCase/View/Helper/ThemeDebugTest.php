@@ -158,7 +158,18 @@ class ThemeDebugTest extends FormTestCase
             ['_Token[unlocked]', 'Form protection unlocked fields'],
             ['_Token[debug]',    'Form protection diagnostics'],
         ] as [$name, $purpose]) {
-            static::assertStringContainsString('field: ' . $name . "\n  purpose: " . $purpose, $trace);
+            static::assertStringContainsString(
+                '<!-- FormCompose internal hidden field: ' . $name . ' (' . $purpose . ') -->',
+                $trace,
+            );
+        }
+
+        $internalComments = [];
+        preg_match_all('/<!-- FormCompose internal hidden field:.*?-->/', $trace, $internalComments);
+        static::assertCount(5, $internalComments[0]);
+        foreach ($internalComments[0] as $comment) {
+            static::assertStringNotContainsString('lookup:', $comment);
+            static::assertStringNotContainsString('element:', $comment);
         }
 
         static::assertStringNotContainsString($csrf, $trace);

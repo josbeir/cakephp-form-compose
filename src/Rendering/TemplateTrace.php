@@ -39,6 +39,47 @@ final readonly class TemplateTrace
             return $html;
         }
 
+        $indent = str_repeat('  ', $depth);
+        $internal = ThemeDebugComment::internalField($node, $this->part);
+        if ($internal !== null) {
+            [$name, $purpose] = $internal;
+            $html = (string)preg_replace('/\\A((?:[ \\t]*\\r?\\n)*)[ \\t]*(?=<[a-zA-Z\\/])/', '$1' . $indent, $html);
+            $separator = str_ends_with($html, "\n") ? '' : "\n";
+
+            return (
+                "\n"
+                    . ThemeDebugComment::format(
+                        ['FormCompose internal hidden field: ' . $name . ' (' . $purpose . ')'],
+                        $indent,
+                    )
+                    . $html
+                    . $separator
+                    . ThemeDebugComment::format(['FormCompose END part=' . $this->part], $indent)
+            );
+        }
+
+        $lines = $this->lines($node);
+
+        // Align the first HTML tag without rewriting lines inside controls or nested traces.
+        $html = (string)preg_replace('/\\A((?:[ \t]*\r?\n)*)[ \t]*(?=<[a-zA-Z\/])/', '$1' . $indent, $html);
+        $separator = str_ends_with($html, "\n") ? '' : "\n";
+
+        return (
+            "\n"
+                . ThemeDebugComment::format($lines, $indent)
+                . $html
+                . $separator
+                . ThemeDebugComment::format(['FormCompose END part=' . $this->part], $indent)
+        );
+    }
+
+    /**
+     * Build the metadata lines for a complete element trace.
+     *
+     * @return list<string>
+     */
+    private function lines(RenderNode $node): array
+    {
         $lines = ['FormCompose BEGIN', 'scope: ' . $node->scope, 'part: ' . $this->part, 'type: ' . $node->type];
         /** @var mixed $field */
         $field = $node->variables['field'] ?? null;
@@ -46,24 +87,7 @@ final readonly class TemplateTrace
             $lines[] = 'field: ' . $field->state->path;
         }
 
-        if ($node->scope === 'form' && $this->part === 'hidden') {
-            /** @var mixed $attributes */
-            $attributes = $node->variables['attributes'] ?? null;
-            /** @var mixed $name */
-            $name = $attributes instanceof Attributes ? $attributes->values['name'] ?? null : null;
-            if (is_string($name)) {
-                $lines[] = 'field: ' . $name;
-                $purpose = match ($name) {
-                    '_csrfToken' => 'CSRF protection',
-                    '_method' => 'HTTP method override',
-                    '_Token[fields]' => 'Form protection signature',
-                    '_Token[unlocked]' => 'Form protection unlocked fields',
-                    '_Token[debug]' => 'Form protection diagnostics',
-                    default => 'Internal form input',
-                };
-                $lines[] = 'purpose: ' . $purpose;
-            }
-        }
+        ThemeDebugComment::appendHiddenFieldMetadata($lines, $node, $this->part);
 
         /** @var mixed $variant */
         $variant = $node->options['variant'] ?? null;
@@ -80,40 +104,6 @@ final readonly class TemplateTrace
             }
         }
 
-        $indent = str_repeat('  ', $depth);
-        // Align the first HTML tag without rewriting lines inside controls or nested traces.
-        $html = (string)preg_replace('/\\A((?:[ \t]*\r?\n)*)[ \t]*(?=<[a-zA-Z\/])/', '$1' . $indent, $html);
-        $separator = str_ends_with($html, "\n") ? '' : "\n";
-
-        return (
-            "\n"
-                . $this->comment($lines, $indent)
-                . $html
-                . $separator
-                . $this->comment(['FormCompose END part=' . $this->part], $indent)
-        );
-    }
-
-    /**
-     * Encode metadata as inert comment text, keeping identifiers on one line.
-     *
-     * @param list<string> $lines Diagnostic lines without values or template variables.
-     */
-    private function comment(array $lines, string $indent): string
-    {
-        $lines = array_map(
-            static fn(string $line): string => str_replace(
-                '--',
-                '&#45;&#45;',
-                Html::text(str_replace(["\r", "\n"], ['\\r', '\\n'], $line)),
-            ),
-            $lines,
-        );
-
-        if (count($lines) === 1) {
-            return $indent . '<!-- ' . $lines[0] . " -->\n";
-        }
-
-        return $indent . '<!-- ' . implode("\n" . $indent, $lines) . "\n" . $indent . "-->\n";
+        return $lines;
     }
 }
