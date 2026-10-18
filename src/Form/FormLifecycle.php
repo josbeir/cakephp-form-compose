@@ -80,6 +80,15 @@ class FormLifecycle
     }
 
     /**
+     * Explicitly unlock a field or collection while this form is open.
+     */
+    public function unlock(string $path): void
+    {
+        $this->assertOpen();
+        $this->protection->optional($path);
+    }
+
+    /**
      * Reject duplicate input identities and file controls outside a multipart form.
      */
     public function assertInput(BoundField $field): void

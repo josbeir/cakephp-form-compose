@@ -238,6 +238,26 @@ a renderable button. Setters include `type(string)`, `name(?string)`,
 Named enabled buttons participate in the submission contract after successful
 rendering. Ordinary labels are escaped; trusted markup requires `Html`.
 
+## unlock() {#unlock}
+
+For a collection whose rows are added or removed in JavaScript, explicitly unlock
+its CakePHP dot path while the form is open:
+
+```php
+$form = $this->Form->bind($team);
+echo $form->open();
+$form->unlock('members');
+echo $form->control('members.0.name');
+echo $form->close();
+```
+
+`unlock(string $path): void` allows the named field and its descendants to be
+omitted, changed, or added without failing CakePHP form protection. Other fields
+and form sessions retain their protection. Call it before or after rendering the
+collection's controls, while the form is open. Use it only for application-managed
+inputs, and validate and authorize submitted rows in the application. It requires
+an open session and does not enable protection when FormProtectionComponent is absent.
+
 ## close() {#close}
 
 `close(): string` validates rendered identities and feedback targets, renders

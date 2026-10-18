@@ -6,6 +6,7 @@ namespace FormCompose\Test\TestCase\Form;
 use Cake\Form\FormProtector;
 use Cake\I18n\I18n;
 use Cake\I18n\Package;
+use Cake\Utility\Hash;
 use Cake\View\Form\ArrayContext;
 use Dom\Element;
 use Dom\NodeList;
@@ -20,7 +21,9 @@ use FormCompose\Test\Fixture\Authoring\FailingPostForm;
 use FormCompose\Test\Fixture\Authoring\LocalEmailForm;
 use FormCompose\Test\Fixture\Authoring\SecureForm;
 use FormCompose\Test\Fixture\Composition\PostForm;
+use FormCompose\Test\Fixture\FailOnceRenderer;
 use LogicException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use RuntimeException;
 
 /**
@@ -158,6 +161,163 @@ class FormSessionTest extends CompositionTestCase
         $complete = $this->helper()->form()->bind();
         $complete->render();
         $this->assertCannotRenderAgain($complete);
+    }
+
+    public function testUnlockedCollectionsAllowRowChangesWithoutUnlockingOtherFieldsOrForms(): void
+    {
+        $helper = $this->helper(attributes: ['formTokenData' => []]);
+        $form = $helper->form()->url('/team')->bind();
+        $html = $form->open();
+        $form->unlock('members');
+        $html .= $form->control('members.0.id')->type('hidden')->value('1')->render();
+        $html .= $form->control('team_id')->type('hidden')->value('7')->render();
+        $html .= $form->close();
+        $session = $helper->getView()->getRequest()->getSession()->id();
+        $data = ['team_id' => '7', '_Token' => $this->tokens($html)];
+        static::assertTrue(new FormProtector()->validate($data, '/team', $session));
+        $data['members'] = [['id' => '2'], ['id' => '3']];
+        static::assertTrue(new FormProtector()->validate($data, '/team', $session));
+        static::assertFalse(new FormProtector()->validate($data + ['injected' => 'extra'], '/team', $session));
+        $data['team_id'] = '8';
+        static::assertFalse(new FormProtector()->validate($data, '/team', $session));
+
+        $other = $helper->form()->url('/team')->bind();
+        $otherHtml =
+            $other->open() . $other->control('members.0.id')->type('hidden')->value('1')->render() . $other->close();
+        $otherData = ['members' => [['id' => '2']], '_Token' => $this->tokens($otherHtml)];
+        static::assertFalse(new FormProtector()->validate($otherData, '/team', $session));
+    }
+
+    #[DataProvider('collectionUnlockOrders')]
+    public function testCollectionUnlocksApplyRegardlessOfRenderingOrder(string $path, string $unlockAt): void
+    {
+        $helper = $this->helper(attributes: ['formTokenData' => []]);
+        $form = $helper->form()->url('/team')->bind();
+        $html = $form->open();
+        if ($unlockAt === 'open') {
+            $form->unlock($path);
+        }
+
+        $html .= $form->control($path . '.0.name')->render();
+        $html .= $form->control($path . '.0.id')
+            ->type('hidden')
+            ->value('1')
+            ->render();
+        if ($unlockAt === 'inputs') {
+            $form->unlock($path);
+        }
+
+        $html .= $form->control($path . '.0.email')->render();
+        $html .= $form->control('team_id')->type('hidden')->value('7')->render();
+        $html .= $form->control('memberships')->type('hidden')->value('protected')->render();
+        $html .= $form->close();
+        $session = $helper->getView()->getRequest()->getSession()->id();
+        $data = ['team_id' => '7', 'memberships' => 'protected', '_Token' => $this->tokens($html)];
+        static::assertTrue(new FormProtector()->validate($data, '/team', $session));
+        $unchanged = Hash::insert($data, $path, [['id' => '1', 'name' => 'Alice', 'email' => 'a@example.test']]);
+        static::assertTrue(new FormProtector()->validate($unchanged, '/team', $session));
+        $changed = Hash::insert($data, $path, [['id' => '2', 'name' => 'Bob'], ['id' => '3', 'name' => 'Carol']]);
+        static::assertTrue(new FormProtector()->validate($changed, '/team', $session));
+        static::assertFalse(new FormProtector()->validate($changed + ['injected' => 'extra'], '/team', $session));
+        static::assertFalse(new FormProtector()->validate(
+            array_replace($changed, ['team_id' => '8']),
+            '/team',
+            $session,
+        ));
+        static::assertFalse(new FormProtector()->validate(
+            array_replace($changed, ['memberships' => 'tampered']),
+            '/team',
+            $session,
+        ));
+    }
+
+    /**
+     * Cover root and nested collections on either side of successful input rendering.
+     *
+     * @return array<string, array{string, string}>
+     */
+    public static function collectionUnlockOrders(): array
+    {
+        return [
+            'root before rendering' => ['members', 'open'],
+            'root after rendering' => ['members', 'inputs'],
+            'nested before rendering' => ['team.members', 'open'],
+            'nested after rendering' => ['team.members', 'inputs'],
+        ];
+    }
+
+    public function testUnlockingARenderedHiddenFieldPreservesItsSiblings(): void
+    {
+        $helper = $this->helper(attributes: ['formTokenData' => []]);
+        $form = $helper->form()->url('/team')->bind();
+        $html = $form->open();
+        $html .= $form->control('members.0.id')->type('hidden')->value('1')->render();
+        $html .= $form->control('members.0.name')->render();
+        $form->unlock('members.0.id');
+        $html .= $form->close();
+        $session = $helper->getView()->getRequest()->getSession()->id();
+        $data = ['members' => [['id' => '2', 'name' => 'Alice']], '_Token' => $this->tokens($html)];
+        static::assertTrue(new FormProtector()->validate($data, '/team', $session));
+        unset($data['members'][0]['id']);
+        static::assertTrue(new FormProtector()->validate($data, '/team', $session));
+        unset($data['members'][0]['name']);
+        static::assertFalse(new FormProtector()->validate($data, '/team', $session));
+    }
+
+    public function testCollectionCanBeUnlockedAfterAFailedClosing(): void
+    {
+        $helper = $this->helper(attributes: ['formTokenData' => []]);
+        $renderer = new FailOnceRenderer(new PhpRenderer($helper->getView()), 'form', 'close');
+        $form = $helper->form()->url('/team')->renderer($renderer)->bind();
+        $html = $form->open();
+        $html .= $form->control('members.0.name')->render();
+        $html .= $form->control('members.0.id')->type('hidden')->value('1')->render();
+        $html .= $form->control('team_id')->type('hidden')->value('7')->render();
+        try {
+            $form->close();
+            static::fail('Expected the closing template to fail.');
+        } catch (RuntimeException $runtimeException) {
+            static::assertSame('Template failed', $runtimeException->getMessage());
+        }
+
+        $form->unlock('members');
+        $html .= $form->close();
+        $session = $helper->getView()->getRequest()->getSession()->id();
+        $data = ['team_id' => '7', '_Token' => $this->tokens($html)];
+        static::assertTrue(new FormProtector()->validate($data, '/team', $session));
+        $data['members'] = [['id' => '2', 'name' => 'Bob']];
+        static::assertTrue(new FormProtector()->validate($data, '/team', $session));
+        $data['team_id'] = '8';
+        static::assertFalse(new FormProtector()->validate($data, '/team', $session));
+    }
+
+    public function testUnlockRequiresAnOpenSession(): void
+    {
+        $form = $this->helper()->bind();
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Expected an open form; current phase is Pending.');
+        $form->unlock('members');
+    }
+
+    public function testUnlockRejectsAClosedSession(): void
+    {
+        $form = $this->helper()->bind();
+        $form->open();
+        $form->close();
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Expected an open form; current phase is Closed.');
+        $form->unlock('members');
+    }
+
+    public function testUnlockDoesNotEnableProtectionOnAnUnprotectedForm(): void
+    {
+        $form = $this->helper()->bind();
+        $html = $form->open();
+        $form->unlock('members');
+        $html .= $form->control('members.0.name')->render();
+        $html .= $form->close();
+        static::assertStringNotContainsString('_Token[', $html);
+        static::assertStringContainsString('name="members[0][name]"', $html);
     }
 
     public function testFailedCompleteRenderingDoesNotEchoOrAutomaticallyClose(): void

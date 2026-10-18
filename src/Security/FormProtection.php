@@ -16,6 +16,8 @@ use FormCompose\Rendering\Attributes;
  * formTokenData on the request. Field types describe submitted names and locked
  * hidden values; optional buttons are unlocked. During closing, token values are
  * returned as attribute bags for the form's hidden-input templates.
+ * Successful submissions are queued until closing so explicit collection unlocks
+ * apply regardless of when their inputs were rendered.
  *
  * Uses CakePHP's internal FormProtector API; supported CakePHP versions are tested
  * for compatibility with this integration.
@@ -23,6 +25,9 @@ use FormCompose\Rendering\Attributes;
 class FormProtection
 {
     protected ?FormProtector $protector = null;
+
+    /** @var list<\FormCompose\Form\Field\Submission> Successfully rendered inputs awaiting token generation. */
+    protected array $submissions = [];
 
     /**
      * Capture the current request without starting a session or registering inputs.
@@ -51,13 +56,11 @@ class FormProtection
      */
     public function register(array $submissions): void
     {
-        foreach ($submissions as $submission) {
-            $this->protector?->addField($submission->name, $submission->locked, $submission->value);
-        }
+        array_push($this->submissions, ...$submissions);
     }
 
     /**
-     * Named submit buttons are optional successful controls, matching native browser behavior.
+     * Explicitly unlocked paths and optional named buttons may vary or be omitted.
      */
     public function optional(string $name): void
     {
@@ -75,7 +78,12 @@ class FormProtection
             return [];
         }
 
-        $data = $this->protector->buildTokenData($state->action, $this->request->getSession()->id());
+        $protector = clone $this->protector;
+        foreach ($this->submissions as $submission) {
+            $protector->addField($submission->name, $submission->locked, $submission->value);
+        }
+
+        $data = $protector->buildTokenData($state->action, $this->request->getSession()->id());
         if (!Configure::read('debug')) {
             unset($data['debug']);
         }
