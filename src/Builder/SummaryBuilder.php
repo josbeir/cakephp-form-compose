@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace FormCompose\Builder;
 
+use Cake\View\HtmlStringable;
 use Closure;
 use FormCompose\Configuration\SummaryConfig;
-use FormCompose\Rendering\Html;
 use FormCompose\Rendering\RenderableInterface;
 
 /**
@@ -15,7 +15,7 @@ use FormCompose\Rendering\RenderableInterface;
 class SummaryBuilder extends ConfigurationBuilder implements RenderableInterface
 {
     /** Set title on this mutable builder. */
-    public function title(string|Html|null $value): static
+    public function title(string|HtmlStringable|null $value): static
     {
         $this->configuration = $this->config()->title($value);
 

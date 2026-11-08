@@ -4,11 +4,11 @@ declare(strict_types=1);
 namespace FormCompose\Test\TestCase\Rendering;
 
 use Cake\View\Form\ArrayContext;
-use FormCompose\Rendering\Html;
 use FormCompose\Rendering\Theme;
 use FormCompose\Test\FormTestCase;
 use InvalidArgumentException;
 use TypeError;
+use function Cake\View\html;
 
 class RenderingTest extends FormTestCase
 {
@@ -63,8 +63,8 @@ class RenderingTest extends FormTestCase
             ->form()
             ->bind()
             ->field('name')
-            ->label(new Html('<b>Name</b>'))
-            ->help(new Html('<em>Help</em>'))
+            ->label(html('<b>Name</b>'))
+            ->help(html('<em>Help</em>'))
             ->resolve();
         static::assertStringContainsString('<b>Name</b>', $field->label()->render());
         static::assertStringContainsString('<em>Help</em>', $field->help()->render());

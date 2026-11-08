@@ -3,12 +3,12 @@ declare(strict_types=1);
 
 namespace FormCompose\Builder;
 
+use Cake\View\HtmlStringable;
 use Closure;
 use FormCompose\Configuration\ButtonConfig;
 use FormCompose\Configuration\FormConfig;
 use FormCompose\Configuration\SummaryConfig;
 use FormCompose\Form\FormSession;
-use FormCompose\Rendering\Html;
 use FormCompose\Rendering\RenderableInterface;
 use FormCompose\Rendering\RendererInterface;
 use FormCompose\Rendering\Theme;
@@ -56,7 +56,7 @@ class FormBuilder extends ConfigurationBuilder implements RenderableInterface
     }
 
     /** Select the complete form's default action. */
-    public function submit(string|Html|false|null $value, ?ButtonConfig $config = null): static
+    public function submit(string|HtmlStringable|false|null $value, ?ButtonConfig $config = null): static
     {
         $this->updateFormConfig($this->config()->submit($value, $config));
 

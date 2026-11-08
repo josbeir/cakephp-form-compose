@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-use FormCompose\Rendering\Html;
+use Cake\View\HtmlString;
 /**
  * @var \FormCompose\Form\Field\Choice $choice
  * @var \FormCompose\Rendering\Attributes $attributes
@@ -8,5 +8,5 @@ use FormCompose\Rendering\Html;
 ?>
 <div<?= (string)$choice->presentation['container'] ?>>
     <input<?= (string)$attributes ?>>
-    <label<?= (string)$choice->presentation['label'] ?>><?= Html::text($choice->label) ?></label>
+    <label<?= (string)$choice->presentation['label'] ?>><?= HtmlString::render($choice->label) ?></label>
 </div>

@@ -9,7 +9,6 @@ use FormCompose\Blueprint\BlueprintFactory;
 use FormCompose\Configuration\ButtonConfig;
 use FormCompose\Configuration\FormConfig;
 use FormCompose\Form\FormSession;
-use FormCompose\Rendering\Html;
 use FormCompose\Rendering\RenderContext;
 use FormCompose\Test\CompositionTestCase;
 use FormCompose\Test\Fixture\Authoring\NameForm;
@@ -19,6 +18,7 @@ use FormCompose\Test\Fixture\ContactFormHelper;
 use FormCompose\Test\Fixture\ContactFormSession;
 use FormCompose\View\Helper\FormHelper;
 use InvalidArgumentException;
+use function Cake\View\html;
 
 /**
  * Exercises complete forms through real helpers, discovery, layouts, and session extensions.
@@ -129,7 +129,10 @@ class FormHelperTest extends CompositionTestCase
     public function testBlueprintsUseTheSessionReturnedByHelperExtensions(): void
     {
         $helper = new ContactFormHelper($this->helper()->getView());
-        $html = $helper->form()->blueprint(WebsiteForm::class)->submit(new Html('<strong>Save</strong>'))->render();
+        $html = $helper->form()
+            ->blueprint(WebsiteForm::class)
+            ->submit(html('<strong>Save</strong>'))
+            ->render();
         static::assertStringContainsString('type="url"', $html);
         static::assertStringContainsString('value="https://example.test"', $html);
         static::assertStringContainsString('data-contact-label', $html);

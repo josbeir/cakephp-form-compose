@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-use FormCompose\Rendering\Html;
+use Cake\View\HtmlString;
 /**
  * @var \FormCompose\Form\Field\Choice $choice
  * @var \FormCompose\Rendering\Attributes $attributes
@@ -8,7 +8,7 @@ use FormCompose\Rendering\Html;
  */
 ?>
 <fieldset<?= (string)$attributes ?>>
-    <legend><?= Html::text($choice->label) ?></legend>
+    <legend><?= HtmlString::render($choice->label) ?></legend>
 <?php foreach ($choice->children as $child): ?>
 <?= $renderChoice($child) ?>
 <?php endforeach; ?>

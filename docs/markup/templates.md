@@ -121,7 +121,7 @@ echo $form->control('email')
 <?php
 declare(strict_types=1);
 
-use FormCompose\Rendering\Html;
+use Cake\View\HtmlString;
 
 /**
  * @var \FormCompose\Form\Field\BoundField $field
@@ -132,7 +132,7 @@ use FormCompose\Rendering\Html;
 <div<?= $attributes ?>>
     <?= $field->label() ?>
     <div class="input-with-icon">
-        <span aria-hidden="true"><?= Html::text($templateData['prefix'] ?? '@') ?></span>
+        <span aria-hidden="true"><?= HtmlString::render($templateData['prefix'] ?? '@') ?></span>
         <?= $field->input() ?>
     </div>
     <?= $field->help() ?>

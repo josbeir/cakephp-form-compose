@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace FormCompose\Rendering;
 
+use Cake\View\HtmlString;
+
 /**
  * Builds safe theme-debug comments, including compact CakePHP hidden-field notes.
  *
@@ -73,7 +75,7 @@ final class ThemeDebugComment
             static fn(string $line): string => str_replace(
                 '--',
                 '&#45;&#45;',
-                Html::text(str_replace(["\r", "\n"], ['\\r', '\\n'], $line)),
+                HtmlString::render(str_replace(["\r", "\n"], ['\\r', '\\n'], $line)),
             ),
             $lines,
         );

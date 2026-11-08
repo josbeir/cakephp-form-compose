@@ -7,14 +7,15 @@ use ArrayObject;
 use Cake\I18n\I18n;
 use Cake\I18n\Package;
 use Cake\View\Form\ArrayContext;
+use Cake\View\HtmlString;
 use Closure;
-use FormCompose\Rendering\Html;
 use FormCompose\Test\Fixture\Translation\ArticleForm;
 use FormCompose\Test\Fixture\Translation\OverriddenForm;
 use FormCompose\Test\FormTestCase;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RuntimeException;
+use function Cake\View\html;
 
 /**
  * Verifies deferred text timing, translation, escaping, and field-state consistency.
@@ -76,15 +77,15 @@ class DeferredTextTest extends FormTestCase
         $other = static fn(): string => 'Application callback';
         $form = $this->helper()->form()->bind();
         $field = $form->field('title')
-            ->label(static function () use ($calls): Html {
+            ->label(static function () use ($calls): HtmlString {
                 $calls['label']++;
 
-                return new Html('<em>Title</em>');
+                return html('<em>Title</em>');
             })
-            ->help(static function () use ($calls): Html {
+            ->help(static function () use ($calls): HtmlString {
                 $calls['help']++;
 
-                return new Html('<strong>Help</strong>');
+                return html('<strong>Help</strong>');
             })
             ->templateData(['callback' => $other])
             ->resolve();
@@ -167,7 +168,7 @@ class DeferredTextTest extends FormTestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
-            'The ' . $key . ' closure must return a string, Html, false, or null.',
+            'The ' . $key . ' closure must return a string, HtmlStringable, false, or null.',
         );
         $builder = $this->helper()->form()->bind()->field('title');
         if ($key === 'label') {

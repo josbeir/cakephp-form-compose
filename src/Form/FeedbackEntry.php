@@ -3,12 +3,12 @@ declare(strict_types=1);
 
 namespace FormCompose\Form;
 
+use Cake\View\HtmlStringable;
 use FormCompose\Binding\FieldPath;
 use FormCompose\Form\Field\BoundField;
 use FormCompose\Form\Field\ErrorTargetProviderInterface;
 use FormCompose\Form\Field\FieldTypeInterface;
 use FormCompose\Rendering\Attributes;
-use FormCompose\Rendering\Html;
 use InvalidArgumentException;
 
 /**
@@ -21,8 +21,11 @@ final readonly class FeedbackEntry
      *
      * @param list<string> $messages Existing validation messages, always escaped when rendered.
      */
-    public function __construct(public string|Html $label, public array $messages, public ?string $target = null)
-    {
+    public function __construct(
+        public string|HtmlStringable $label,
+        public array $messages,
+        public ?string $target = null,
+    ) {
         if ($target === '') {
             throw new InvalidArgumentException('Error summary targets must be nonempty IDs or null.');
         }
@@ -39,7 +42,7 @@ final readonly class FeedbackEntry
             return null;
         }
 
-        /** @var string|Html|false $label */
+        /** @var string|HtmlStringable|false $label */
         $label = $field->state->config->label ?? FieldPath::label($field->state->path);
 
         return new self(

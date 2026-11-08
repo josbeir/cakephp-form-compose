@@ -3,11 +3,11 @@ declare(strict_types=1);
 
 namespace FormCompose\Blueprint;
 
+use Cake\View\HtmlStringable;
 use FormCompose\Binding\FieldPath;
 use FormCompose\Binding\RepeatedErrors;
 use FormCompose\Form\FormSession;
 use FormCompose\Form\InputRegistry;
-use FormCompose\Rendering\Html;
 use FormCompose\Rendering\RenderContext;
 use FormCompose\Rendering\RenderNode;
 
@@ -88,11 +88,11 @@ class RepeatedView
     /**
      * Read an explicit or conventional collection label for feedback.
      */
-    public function label(): string|Html
+    public function label(): string|HtmlStringable
     {
         /** @var mixed $label */
         $label = $this->definition->config->label ?? FieldPath::label($this->definition->path);
 
-        return $label instanceof Html ? $label : (string)$label;
+        return $label instanceof HtmlStringable ? $label : (string)$label;
     }
 }

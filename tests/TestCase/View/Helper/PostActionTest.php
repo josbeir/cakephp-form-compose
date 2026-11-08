@@ -4,10 +4,10 @@ declare(strict_types=1);
 namespace FormCompose\Test\TestCase\View\Helper;
 
 use FormCompose\Configuration\FormConfig;
-use FormCompose\Rendering\Html;
 use FormCompose\Rendering\Theme;
 use FormCompose\Test\FormTestCase;
 use InvalidArgumentException;
+use function Cake\View\html;
 
 /**
  * Exercises standalone action output through the real helper and PHP templates.
@@ -51,7 +51,8 @@ class PostActionTest extends FormTestCase
             ->method('DELETE')
             ->attributes(['target' => '_blank'])
             ->render();
-        $html .= $helper->postLink(label: new Html('<strong>Archive</strong>'), url: '/records/archive/5')->render();
+        $html .= $helper->postLink(label: html('<strong>Archive</strong>'), url: '/records/archive/5')
+            ->render();
         $xpath = $this->xpath($html);
         static::assertSame(2, $xpath->query('//form[@hidden]')->length);
         static::assertSame('DELETE', $xpath->evaluate('string(//form[1]/input[@name="_method"]/@value)'));
@@ -103,7 +104,7 @@ class PostActionTest extends FormTestCase
             'form.open' => ['class' => 'action-form'],
         ]);
         $helper = $this->helper();
-        $html = $helper->postButton(label: new Html('<em>Go</em>'), url: '/go', theme: $theme)
+        $html = $helper->postButton(label: html('<em>Go</em>'), url: '/go', theme: $theme)
             ->partTemplate('control', 'actions/button')
             ->templateData(['marker' => '<custom>'])
             ->render();

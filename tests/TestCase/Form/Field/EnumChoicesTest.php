@@ -6,7 +6,6 @@ namespace FormCompose\Test\TestCase\Form\Field;
 use Cake\View\Form\ArrayContext;
 use FormCompose\Configuration\ChoiceConfig;
 use FormCompose\Form\Field\Choices;
-use FormCompose\Rendering\Html;
 use FormCompose\Rendering\Theme;
 use FormCompose\Test\Fixture\Enum\ArticleForm;
 use FormCompose\Test\Fixture\Enum\Priority;
@@ -17,6 +16,7 @@ use Generator;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use stdClass;
+use function Cake\View\html;
 
 /**
  * Exercises enum choices through binding, native rendering, and blueprint configuration.
@@ -122,7 +122,7 @@ class EnumChoicesTest extends FormTestCase
         $html = $form->control('priority')
             ->choices([
                 new ChoiceConfig(Priority::Normal, null, []),
-                new ChoiceConfig(Priority::Urgent, new Html('<strong>Urgent</strong>'), []),
+                new ChoiceConfig(Priority::Urgent, html('<strong>Urgent</strong>'), []),
             ])
             ->placeholder(false)
             ->render();

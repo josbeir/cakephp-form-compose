@@ -7,12 +7,12 @@ use Cake\View\Form\ArrayContext;
 use FormCompose\Blueprint\FormDefinition;
 use FormCompose\Configuration\FieldConfig;
 use FormCompose\Form\Field\FieldDefinition;
-use FormCompose\Rendering\Html;
 use FormCompose\Rendering\PhpRenderer;
 use FormCompose\Rendering\Theme;
 use FormCompose\Test\Fixture\RecordingRenderer;
 use FormCompose\Test\FormTestCase;
 use stdClass;
+use function Cake\View\html;
 
 /**
  * Verifies template metadata through real elements and the custom renderer contract.
@@ -32,7 +32,7 @@ class TemplateDataTest extends FormTestCase
             ->templateData(['marker' => 'contact', 'content' => '<script>alert(1)</script>'])
             ->render();
         $trusted = $form->control('name')
-            ->templateData(['content' => new Html('<strong>Trusted</strong>')])
+            ->templateData(['content' => html('<strong>Trusted</strong>')])
             ->render();
         $form->close();
 

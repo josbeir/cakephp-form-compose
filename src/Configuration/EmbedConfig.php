@@ -3,18 +3,18 @@ declare(strict_types=1);
 
 namespace FormCompose\Configuration;
 
-use FormCompose\Rendering\Html;
+use Cake\View\HtmlStringable;
 
 /** Immutable embed configuration captured before binding or rendering. */
 final class EmbedConfig extends Configuration
 {
     /** The configured label setting. */
-    public string|Html|null $label {
+    public string|HtmlStringable|null $label {
         get {
             /** @var mixed $value */
             $value = $this->values['label'] ?? null;
             assert(
-                $value === null || is_string($value) || $value instanceof Html,
+                $value === null || is_string($value) || $value instanceof HtmlStringable,
                 'Typed configuration must retain its declared value type.',
             );
 
@@ -23,7 +23,7 @@ final class EmbedConfig extends Configuration
     }
 
     /** Return configuration with an explicit label setting. */
-    public function label(string|Html|null $value): static
+    public function label(string|HtmlStringable|null $value): static
     {
         return $this->changed('label', $value);
     }
@@ -47,7 +47,7 @@ final class EmbedConfig extends Configuration
 
     /** Initialize common named settings without losing explicit null values. */
     public function __construct(
-        string|Html|Unspecified|null $label = Unspecified::Value,
+        string|HtmlStringable|Unspecified|null $label = Unspecified::Value,
         bool|Unspecified $errors = Unspecified::Value,
     ) {
         parent::__construct(array_filter(

@@ -3,9 +3,10 @@ declare(strict_types=1);
 
 namespace FormCompose\Form\Field;
 
+use Cake\View\HtmlString;
+use Cake\View\HtmlStringable;
 use FormCompose\Binding\FieldPath;
 use FormCompose\Configuration\FieldConfig;
-use FormCompose\Rendering\Html;
 
 /**
  * Contains the resolved identity, value, constraints, and feedback for one field.
@@ -80,10 +81,10 @@ final readonly class FieldState
      */
     public function labelText(): string
     {
-        /** @var string|Html|false $label Resolved by FieldText before state construction. */
+        /** @var string|HtmlStringable|false $label Resolved by FieldText before state construction. */
         $label = $this->config->label ?? FieldPath::label($this->path);
 
-        return Html::text($label instanceof Html ? $label : (string)$label);
+        return HtmlString::render($label instanceof HtmlStringable ? $label : (string)$label);
     }
 
     /**
@@ -91,9 +92,9 @@ final readonly class FieldState
      */
     public function helpText(): string
     {
-        /** @var string|Html|false $help Resolved by FieldText before state construction. */
+        /** @var string|HtmlStringable|false $help Resolved by FieldText before state construction. */
         $help = $this->config->help ?? '';
 
-        return Html::text($help instanceof Html ? $help : (string)$help);
+        return HtmlString::render($help instanceof HtmlStringable ? $help : (string)$help);
     }
 }

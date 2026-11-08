@@ -65,7 +65,7 @@ $title = FieldConfig::builder()
     ->label(static fn(): string => __('Article title'));
 ```
 
-Closures return string, trusted `Html`, false, or null. They run after overrides
+Closures return string, trusted `HtmlStringable`, false, or null. They run after overrides
 merge, once per bound-field snapshot; overridden callbacks do not run. An existing
 snapshot retains its text after locale changes. Resolve a fresh field to reevaluate
 its closure. Choices use ordinary translated labels or CakePHP's
@@ -172,7 +172,7 @@ See [services and discovery](/blueprint-configuration).
 
 ## Repeated blueprints and occurrence options
 
-`EmbedConfig::builder()` exposes `label(string|Html|null)`,
+`EmbedConfig::builder()` exposes `label(string|HtmlStringable|null)`,
 `errors(bool = true)`, and shared presentation methods. The factory returns an
 immutable `EmbedConfig`; fluent calls return new configs, and `merge(EmbedConfig)`
 overlays explicit settings. Constructors accept label and errors by name. Row selection belongs to `keys(?array)` on the

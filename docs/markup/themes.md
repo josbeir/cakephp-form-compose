@@ -116,16 +116,16 @@ Use the same directory for other parts. A shared submit button lives at
 <?php
 declare(strict_types=1);
 
-use FormCompose\Rendering\Html;
+use Cake\View\HtmlString;
 
 /**
  * @var \FormCompose\Rendering\Attributes $attributes
- * @var string|\FormCompose\Rendering\Html $label
+ * @var string|\Cake\View\HtmlStringable $label
  */
 ?>
 <button<?= $attributes ?>>
     <span aria-hidden="true">→</span>
-    <?= Html::text($label) ?>
+    <?= HtmlString::render($label) ?>
 </button>
 ```
 

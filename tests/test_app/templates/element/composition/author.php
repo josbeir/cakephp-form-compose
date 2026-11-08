@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-use FormCompose\Rendering\Html;
+use Cake\View\HtmlString;
 /**
  * @var \FormCompose\Blueprint\BlueprintView $form
  * @var \FormCompose\Rendering\Attributes $attributes
@@ -9,7 +9,7 @@ use FormCompose\Rendering\Html;
  */
 ?>
 <section<?= (string)$attributes->merge(['data-author' => true]) ?>>
-    <h2><?= Html::text((string)$templateData['heading']) ?></h2>
+    <h2><?= HtmlString::render((string)$templateData['heading']) ?></h2>
     <div class="grid grid-cols-2 gap-4">
         <?= (string) $form->controls(['first_name', 'last_name']) ?>
     </div>

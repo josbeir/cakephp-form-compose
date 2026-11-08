@@ -38,8 +38,8 @@ $hasErrors = $title->state->hasErrors();
 | `grouped(): bool` | True for radio, multi-checkbox, and composite controls. |
 | `hasHelp(): bool` | Whether nonempty help is enabled. |
 | `hasErrors(): bool` | Whether messages exist and error rendering is enabled. |
-| `labelText(): string` | Escaped generated/configured label, preserving trusted `Html`. |
-| `helpText(): string` | Escaped configured help, preserving trusted `Html`. |
+| `labelText(): string` | Escaped generated/configured label, preserving trusted `HtmlString`. |
+| `helpText(): string` | Escaped configured help, preserving trusted `HtmlString`. |
 
 `requiredMessage` is context metadata, separate from the effective `required`
 constraint. It remains available when a field override makes the control optional,
@@ -185,14 +185,14 @@ and handles an ordinary scalar text field:
 ```php
 <?php
 
-use FormCompose\Rendering\Html;
+use Cake\View\HtmlString;
 
 $title = $form->field('title')
     ->type('text')
     ->resolve();
 ?>
 <?= $title->label() ?>
-<input type="text"<?= $title->attributes() ?> value="<?= Html::text((string)$title->state->value) ?>">
+<input type="text"<?= $title->attributes() ?> value="<?= HtmlString::render((string)$title->state->value) ?>">
 <?php $title->register(); ?>
 <?= $title->help() ?>
 <?= $title->errors() ?>

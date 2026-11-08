@@ -5,12 +5,12 @@ namespace FormCompose\Test\TestCase\Rendering;
 
 use Cake\View\Form\ArrayContext;
 use FormCompose\Configuration\SummaryConfig;
-use FormCompose\Rendering\Html;
 use FormCompose\Test\Fixture\Authoring\CommentsForm;
 use FormCompose\Test\Fixture\Authoring\EmptyForm;
 use FormCompose\Test\Fixture\Authoring\TitleForm;
 use FormCompose\Test\Fixture\Summary\CustomHelper;
 use FormCompose\Test\FormTestCase;
+use function Cake\View\html;
 
 /**
  * Verifies the rendered-field scope, template API, and complete-form placement.
@@ -57,7 +57,7 @@ class ErrorSummaryTest extends FormTestCase
         $form->open();
         $form->control('title')->label('<Title>')->render();
         $form->control('trusted')
-            ->label(new Html('<em>Trusted</em>'))
+            ->label(html('<em>Trusted</em>'))
             ->render();
 
         $summary = $form->errorSummary()->title('<Errors>')->render();
@@ -113,7 +113,7 @@ class ErrorSummaryTest extends FormTestCase
             ->bind();
         $form->open();
         $form->embedMany(path: 'comments', blueprint: EmptyForm::class)
-            ->label(new Html('<strong>Comments</strong>'))
+            ->label(html('<strong>Comments</strong>'))
             ->render();
         static::assertStringContainsString('<strong>Comments</strong>: At least one', $form->errorSummary()->render());
         $form->close();
@@ -142,7 +142,7 @@ class ErrorSummaryTest extends FormTestCase
             ->errorSummary(
                 SummaryConfig::builder()
                     ->partTemplate('control', 'summary/custom')
-                    ->title(new Html('<em>Errors</em>'))
+                    ->title(html('<em>Errors</em>'))
                     ->attributes(['id' => 'validation', 'class' => 'notice'])
                     ->partAttributes('title', ['id' => 'validation-heading'])
                     ->templateData(['intro' => 'Check <these>']),

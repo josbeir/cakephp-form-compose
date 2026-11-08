@@ -181,7 +181,7 @@ Here form elements receive `['layout' => 'stacked']`, the title field receives
 
 When omitted, the bag is `[]`. The native array parameter rejects null and
 non-array containers with `TypeError`. Values inside the bag may include objects,
-nested arrays, false, zero, null, and trusted `Html`. Objects retain their identity;
+nested arrays, false, zero, null, and trusted `HtmlString`. Objects retain their identity;
 data is not serialized, stringified, or pre-escaped.
 
 `templateData()` merges named entries over earlier layers. Use
@@ -190,8 +190,8 @@ bag. Replacement intent survives reusable config snapshots. A field's parts
 inherit its bag; local part data remains local.
 
 ::: tip Escape at the point of output
-Templates receive original PHP values. Use `Html::text()` for text; it escapes
-ordinary strings and preserves explicitly trusted `Html`. Use an `Attributes` bag
+Templates receive original PHP values. Use `HtmlString::render()` for text; it escapes
+ordinary strings and preserves explicitly trusted `HtmlString`. Use an `Attributes` bag
 when intentionally putting a value into an HTML attribute.
 :::
 
@@ -258,8 +258,8 @@ markup. Token generation belongs to the form lifecycle; the elements output its
 prepared fields.
 
 Button templates receive `$form`, `$label`, `$attributes`, and `$templateData`. Use
-`Html::text($label)` to escape ordinary labels while preserving explicitly trusted
-`Html` labels.
+`HtmlString::render($label)` to escape ordinary labels while preserving explicitly trusted
+`HtmlString` labels.
 
 ### Complete-form layouts
 
@@ -274,7 +274,7 @@ do not invoke this part.
 | `$state` | Prepared form metadata, including the effective method. |
 | `$body` | Already rendered blueprint HTML, including nested/custom controls. Emit it once. |
 | `$summary` | Already rendered summary HTML, or an empty string. Emit it once. |
-| `$submit` | Requested text/trusted `Html` label, translated default Submit label, or `false`. |
+| `$submit` | Requested text/trusted `HtmlString` label, translated default Submit label, or `false`. |
 | `$submitConfig` | Immutable `ButtonConfig` configured on the form builder. |
 | `$templateData` | The form's application-owned presentation data. |
 | `$parent` | Callback that resumes normal theme lookup for this part. |
@@ -333,7 +333,7 @@ layout. There is no `row` template part. See the
 
 The `error-summary` scope renders `control`. Its element receives `$form`,
 `$entries` (`list<FeedbackEntry>`), `$title`, `$attributes`, `$titleAttributes`,
-and `$templateData`. An entry exposes `label` (text or trusted `Html`), `messages`
+and `$templateData`. An entry exposes `label` (text or trusted `HtmlString`), `messages`
 (raw validation strings; escape them when outputting), and `target` (an emitted DOM ID or null for an unlinked message).
 
 The default section and heading IDs are associated with `aria-labelledby` and
@@ -352,27 +352,27 @@ echo $form->errorSummary()->template('forms/summary');
 <?php
 declare(strict_types=1);
 
-use FormCompose\Rendering\Html;
+use Cake\View\HtmlString;
 
 /**
  * @var list<\FormCompose\Form\FeedbackEntry> $entries
- * @var string|\FormCompose\Rendering\Html $title
+ * @var string|\Cake\View\HtmlStringable $title
  * @var \FormCompose\Rendering\Attributes $attributes
  * @var \FormCompose\Rendering\Attributes $titleAttributes
  */
 ?>
 <section<?= $attributes ?>>
-    <h2<?= $titleAttributes ?>><?= Html::text($title) ?></h2>
+    <h2<?= $titleAttributes ?>><?= HtmlString::render($title) ?></h2>
     <ul>
         <?php foreach ($entries as $entry): ?>
             <?php foreach ($entry->messages as $message): ?>
                 <li>
                     <?php if ($entry->target !== null): ?>
-                        <a href="<?= Html::text('#' . rawurlencode($entry->target)) ?>">
-                            <?= Html::text($entry->label) ?>: <?= Html::text($message) ?>
+                        <a href="<?= HtmlString::render('#' . rawurlencode($entry->target)) ?>">
+                            <?= HtmlString::render($entry->label) ?>: <?= HtmlString::render($message) ?>
                         </a>
                     <?php else: ?>
-                        <?= Html::text($entry->label) ?>: <?= Html::text($message) ?>
+                        <?= HtmlString::render($entry->label) ?>: <?= HtmlString::render($message) ?>
                     <?php endif; ?>
                 </li>
             <?php endforeach; ?>
@@ -494,20 +494,23 @@ The bag does not resolve conflicting CSS utilities.
 
 ## Trusted markup
 
-`FormCompose\Rendering\Html` explicitly marks developer-controlled markup for
+`Cake\View\HtmlString` explicitly marks developer-controlled markup for
 labels, help, or button content. It does not sanitize HTML.
 
 ```php
-use FormCompose\Rendering\Html;
+use function Cake\View\html;
 
 // Inside an open form.
-echo $form->submit(new Html('<strong>Save article</strong>'));
+echo $form->submit(html('<strong>Save article</strong>'));
 ```
 
-`new Html(string $value)` exposes readonly `value`.
-`Html::text(string|Html $text): string` escapes ordinary strings and preserves an
-explicit `Html` value. Custom templates should use this method when outputting
-text. Attribute values always go through the attribute bag's escaping.
+`Cake\View\html(string $html): HtmlString` wraps trusted markup. The explicit
+`new HtmlString(string $value)` constructor is also available. Cast the result to a
+string to read its markup.
+`HtmlString::render(string|HtmlStringable $text): string` escapes ordinary strings and preserves an
+implementation of `Cake\View\HtmlStringable`, including `HtmlString` and application-owned
+components. Custom templates should use this method when outputting content.
+Attribute values always go through the attribute bag's escaping.
 
 ## Custom widget bodies
 

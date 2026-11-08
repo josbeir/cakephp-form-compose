@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace FormCompose\Form;
 
+use Cake\View\HtmlStringable;
 use Closure;
 use FormCompose\Binding\FieldResolver;
 use FormCompose\Binding\FormBinding;
@@ -28,7 +29,6 @@ use FormCompose\Form\Field\BoundField;
 use FormCompose\Form\Field\FieldSpec;
 use FormCompose\Rendering\CompleteFormRenderer;
 use FormCompose\Rendering\ErrorSummaryRenderer;
-use FormCompose\Rendering\Html;
 use FormCompose\Rendering\RenderContext;
 use FormCompose\Rendering\RenderNode;
 use InvalidArgumentException;
@@ -371,7 +371,7 @@ class FormSession
      * Render a themed button and register its optional submission only after rendering succeeds.
      *
      */
-    public function submit(string|Html $label, ?ButtonConfig $config = null): ButtonBuilder
+    public function submit(string|HtmlStringable $label, ?ButtonConfig $config = null): ButtonBuilder
     {
         return new ButtonBuilder(fn(ButtonConfig $settings): string => $this->renderButton(
             $label,
@@ -380,7 +380,7 @@ class FormSession
     }
 
     /** Commit a named button only after its template has succeeded. */
-    protected function renderButton(string|Html $label, ButtonConfig $config): string
+    protected function renderButton(string|HtmlStringable $label, ButtonConfig $config): string
     {
         $this->lifecycle->assertOpen();
         $attributes = $this->rendering

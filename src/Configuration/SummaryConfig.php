@@ -3,18 +3,18 @@ declare(strict_types=1);
 
 namespace FormCompose\Configuration;
 
-use FormCompose\Rendering\Html;
+use Cake\View\HtmlStringable;
 
 /** Immutable summary configuration captured before binding or rendering. */
 final class SummaryConfig extends Configuration
 {
     /** The configured title setting. */
-    public string|Html|null $title {
+    public string|HtmlStringable|null $title {
         get {
             /** @var mixed $value */
             $value = $this->values['title'] ?? null;
             assert(
-                $value === null || is_string($value) || $value instanceof Html,
+                $value === null || is_string($value) || $value instanceof HtmlStringable,
                 'Typed configuration must retain its declared value type.',
             );
 
@@ -23,14 +23,14 @@ final class SummaryConfig extends Configuration
     }
 
     /** Return configuration with an explicit title setting. */
-    public function title(string|Html|null $value): static
+    public function title(string|HtmlStringable|null $value): static
     {
         return $this->changed('title', $value);
     }
 
     /** Initialize common named settings without losing explicit null values. */
     public function __construct(
-        string|Html|Unspecified|null $title = Unspecified::Value,
+        string|HtmlStringable|Unspecified|null $title = Unspecified::Value,
     ) {
         parent::__construct(array_filter(
             ['title' => $title],

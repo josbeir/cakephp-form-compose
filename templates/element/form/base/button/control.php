@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
-use FormCompose\Rendering\Html;
+use Cake\View\HtmlString;
 /**
- * @var string|\FormCompose\Rendering\Html $label
+ * @var string|\Cake\View\HtmlStringable $label
  * @var \FormCompose\Rendering\Attributes $attributes
  */
 ?>
-<button<?= (string)$attributes ?>><?= Html::text($label) ?></button>
+<button<?= (string)$attributes ?>><?= HtmlString::render($label) ?></button>
