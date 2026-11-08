@@ -512,12 +512,6 @@ implementation of `Cake\View\HtmlStringable`, including `HtmlString` and applica
 components. Custom templates should use this method when outputting content.
 Attribute values always go through the attribute bag's escaping.
 
-The former `FormCompose\Rendering\Html` wrapper has been removed. Replace its import
-with `use function Cake\View\html;` and `new Html(...)` with `html(...)`.
-Replace `Html::text(...)` with `HtmlString::render(...)`, importing `Cake\View\HtmlString`
-where needed. Custom method signatures should accept `Cake\View\HtmlStringable` for
-trusted content.
-
 ## Custom widget bodies
 
 [Custom field types](/custom-fields) use two additional field body parts:
