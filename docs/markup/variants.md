@@ -100,15 +100,15 @@ echo $form->submit('Save')->variant('primary');
 <?php
 declare(strict_types=1);
 
-use FormCompose\Rendering\Html;
+use Cake\View\HtmlString;
 
 /**
  * @var \FormCompose\Rendering\Attributes $attributes
- * @var string|\FormCompose\Rendering\Html $label
+ * @var string|\Cake\View\HtmlStringable $label
  */
 ?>
 <button<?= $attributes->merge(['class' => 'button-primary']) ?>>
-    <?= Html::text($label) ?>
+    <?= HtmlString::render($label) ?>
 </button>
 ```
 

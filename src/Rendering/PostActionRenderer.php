@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace FormCompose\Rendering;
 
+use Cake\View\HtmlStringable;
 use Cake\View\View;
 use Closure;
 use FormCompose\Configuration\ActionConfig;
@@ -34,7 +35,7 @@ class PostActionRenderer
      *
      */
     public function render(
-        string|Html $label,
+        string|HtmlStringable $label,
         array|string|null $url,
         ActionConfig $config,
         string $kind,
@@ -68,7 +69,7 @@ class PostActionRenderer
      * Reuse normal button rendering or render a link associated with the action form.
      */
     protected function trigger(
-        string|Html $label,
+        string|HtmlStringable $label,
         PostAction $action,
         FormSession $form,
         RenderContext $rendering,

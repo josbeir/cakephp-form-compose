@@ -6,12 +6,12 @@ namespace FormCompose\Form\Field;
 use BackedEnum;
 use Cake\Database\Type\EnumLabelInterface;
 use Cake\Utility\Inflector;
+use Cake\View\HtmlStringable;
 use FormCompose\Binding\EnumChoices;
 use FormCompose\Configuration\ChoiceConfig;
 use FormCompose\Configuration\ChoiceGroupConfig;
 use FormCompose\Configuration\Unspecified;
 use FormCompose\Rendering\Attributes;
-use FormCompose\Rendering\Html;
 use FormCompose\Rendering\Theme;
 use InvalidArgumentException;
 use UnitEnum;
@@ -93,7 +93,7 @@ class Choices
 
         return new Choice(
             'item',
-            $text instanceof Html ? $text : (string)$text,
+            $text instanceof HtmlStringable ? $text : (string)$text,
             $this->createChoiceAttributes()->resolve($state, $attributes, $option),
             [],
             [
@@ -112,7 +112,10 @@ class Choices
         $option = match (true) {
             $label instanceof ChoiceConfig => $label,
             $label instanceof UnitEnum => new ChoiceConfig($label),
-            default => new ChoiceConfig($value, $label instanceof Html || $label === null ? $label : (string)$label),
+            default => new ChoiceConfig(
+                $value,
+                $label instanceof HtmlStringable || $label === null ? $label : (string)$label,
+            ),
         };
         if ($option->value instanceof UnitEnum) {
             if (!$option->value instanceof BackedEnum) {

@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace FormCompose\Builder;
 
+use Cake\View\HtmlStringable;
 use Closure;
 use FormCompose\Configuration\EmbedConfig;
-use FormCompose\Rendering\Html;
 use FormCompose\Rendering\RenderableInterface;
 
 /**
@@ -15,7 +15,7 @@ use FormCompose\Rendering\RenderableInterface;
 class EmbedBuilder extends ConfigurationBuilder implements RenderableInterface
 {
     /** Set label on this mutable builder. */
-    public function label(string|Html|null $value): static
+    public function label(string|HtmlStringable|null $value): static
     {
         $this->configuration = $this->config()->label($value);
 

@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace FormCompose\Binding;
 
+use Cake\View\HtmlStringable;
 use Closure;
 use FormCompose\Configuration\FieldConfig;
-use FormCompose\Rendering\Html;
 use InvalidArgumentException;
 
 /**
@@ -39,10 +39,10 @@ final class FieldText
                     $text !== null
                     && $text !== false
                     && !is_string($text)
-                    && !$text instanceof Html
+                    && !$text instanceof HtmlStringable
                 ) {
                     throw new InvalidArgumentException(
-                        'The ' . $key . ' closure must return a string, Html, false, or null.',
+                        'The ' . $key . ' closure must return a string, HtmlStringable, false, or null.',
                     );
                 }
             }

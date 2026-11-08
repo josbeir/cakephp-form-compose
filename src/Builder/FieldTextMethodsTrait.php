@@ -3,16 +3,16 @@ declare(strict_types=1);
 
 namespace FormCompose\Builder;
 
+use Cake\View\HtmlStringable;
 use Closure;
 use FormCompose\Configuration\FieldConfig;
-use FormCompose\Rendering\Html;
 
 /** Mutable field text setters.
  */
 trait FieldTextMethodsTrait
 {
     /** Set label on this mutable builder. */
-    public function label(string|Html|Closure|false|null $value): static
+    public function label(string|HtmlStringable|Closure|false|null $value): static
     {
         $this->updateFieldConfig($this->config()->label($value));
 
@@ -20,7 +20,7 @@ trait FieldTextMethodsTrait
     }
 
     /** Set help on this mutable builder. */
-    public function help(string|Html|Closure|false|null $value): static
+    public function help(string|HtmlStringable|Closure|false|null $value): static
     {
         $this->updateFieldConfig($this->config()->help($value));
 

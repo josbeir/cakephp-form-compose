@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace FormCompose\Rendering;
 
+use Cake\View\HtmlString;
 use InvalidArgumentException;
 use Stringable;
 
@@ -108,7 +109,7 @@ final readonly class Attributes implements Stringable
                 ' '
                 . $name
                 . '="'
-                . Html::text($name === 'class' ? AttributeTokens::normalize($value) : (string)$value)
+                . HtmlString::render($name === 'class' ? AttributeTokens::normalize($value) : (string)$value)
                 . '"';
         }
 

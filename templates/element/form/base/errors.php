@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-use FormCompose\Rendering\Html;
+use Cake\View\HtmlString;
 
 /**
  * @var \FormCompose\Form\Field\BoundField $field
@@ -9,6 +9,6 @@ use FormCompose\Rendering\Html;
 ?>
 <ul<?= (string)$attributes ?>>
 <?php foreach ($field->state->messages as $message): ?>
-    <li><?= Html::text($message) ?></li>
+    <li><?= HtmlString::render($message) ?></li>
 <?php endforeach; ?>
 </ul>

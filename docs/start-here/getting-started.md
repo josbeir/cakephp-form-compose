@@ -6,7 +6,8 @@ description: Install FormCompose and render an article edit form with labels, va
 # Your first form
 
 Build an article editing form using your existing CakePHP entity and controller.
-You need PHP 8.5+ and CakePHP 6 development builds.
+You need PHP 8.5+ and a CakePHP 6 development build that includes
+`Cake\View\HtmlString` and `Cake\View\HtmlStringable`.
 
 ## Install the plugin
 

@@ -12,7 +12,6 @@ use Dom\Element;
 use Dom\NodeList;
 use FormCompose\Configuration\ButtonConfig;
 use FormCompose\Form\FormSession;
-use FormCompose\Rendering\Html;
 use FormCompose\Rendering\PhpRenderer;
 use FormCompose\Rendering\Theme;
 use FormCompose\Test\CompositionTestCase;
@@ -25,6 +24,7 @@ use FormCompose\Test\Fixture\FailOnceRenderer;
 use LogicException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RuntimeException;
+use function Cake\View\html;
 
 /**
  * Verifies convenient rendering preserves session state, extensions, and real protection tokens.
@@ -111,7 +111,7 @@ class FormSessionTest extends CompositionTestCase
         );
         static::assertStringContainsString(
             '<strong>Save</strong>',
-            $helper->form()->submit(new Html('<strong>Save</strong>'))->bind()->render(),
+            $helper->form()->submit(html('<strong>Save</strong>'))->bind()->render(),
         );
         static::assertStringContainsString('></button>', $helper->form()->submit('')->bind()->render());
     }

@@ -40,7 +40,7 @@ class MarkdownType extends SingleInputType
 <?php
 declare(strict_types=1);
 
-use FormCompose\Rendering\Html;
+use Cake\View\HtmlString;
 
 /**
  * @var \FormCompose\Rendering\Attributes $attributes
@@ -50,7 +50,7 @@ use FormCompose\Rendering\Html;
 <textarea<?= $attributes->merge([
     'data-editor' => 'markdown',
     'rows' => 12,
-]) ?>><?= Html::text($value) ?></textarea>
+]) ?>><?= HtmlString::render($value) ?></textarea>
 ```
 
 ```php [templates/Articles/edit.php]
@@ -69,7 +69,7 @@ $form = $this->Form->bind($article);
 
 `SingleInputType` supplies the field's name, ID, and feedback attributes through
 `$attributes`, and its displayed text through `$value`. Preserve those attributes
-and escape the text with `Html::text()`. The normal label, help, and errors still
+and escape the text with `HtmlString::render()`. The normal label, help, and errors still
 render around the textarea.
 
 Your editor can find `data-editor="markdown"` and enhance the textarea. Keep its

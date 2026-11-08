@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace FormCompose\Configuration;
 
-use FormCompose\Rendering\Html;
+use Cake\View\HtmlStringable;
 use FormCompose\Rendering\RendererInterface;
 use FormCompose\Rendering\Theme;
 
@@ -317,12 +317,12 @@ final class FormConfig extends Configuration
 
     /** The configured submit setting. */
 
-    public string|Html|false|null $submit {
+    public string|HtmlStringable|false|null $submit {
         get {
             /** @var mixed $value */
             $value = $this->values['submit'] ?? null;
             assert(
-                $value === null || $value === false || is_string($value) || $value instanceof Html,
+                $value === null || $value === false || is_string($value) || $value instanceof HtmlStringable,
                 'Typed configuration must retain its declared value type.',
             );
 
@@ -331,7 +331,7 @@ final class FormConfig extends Configuration
     }
 
     /** Return configuration with an explicit submit setting. */
-    public function submit(string|Html|false|null $value, ?ButtonConfig $config = null): static
+    public function submit(string|HtmlStringable|false|null $value, ?ButtonConfig $config = null): static
     {
         $updated = $this->changed('submit', $value);
 

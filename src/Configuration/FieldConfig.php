@@ -4,9 +4,9 @@ declare(strict_types=1);
 namespace FormCompose\Configuration;
 
 use BackedEnum;
+use Cake\View\HtmlStringable;
 use Closure;
 use DateTimeZone;
-use FormCompose\Rendering\Html;
 use InvalidArgumentException;
 
 /**
@@ -57,8 +57,8 @@ final class FieldConfig extends Configuration
     /** Initialize common named settings; fluent methods return independent configurations. */
     public function __construct(
         string|Unspecified|null $type = Unspecified::Value,
-        string|Html|Closure|Unspecified|false|null $label = Unspecified::Value,
-        string|Html|Closure|Unspecified|false|null $help = Unspecified::Value,
+        string|HtmlStringable|Closure|Unspecified|false|null $label = Unspecified::Value,
+        string|HtmlStringable|Closure|Unspecified|false|null $help = Unspecified::Value,
     ) {
         parent::__construct(array_filter(
             ['type' => $type, 'label' => $label, 'help' => $help],
@@ -124,7 +124,7 @@ final class FieldConfig extends Configuration
     }
 
     /** The configured label setting. */
-    public string|Html|Closure|false|null $label {
+    public string|HtmlStringable|Closure|false|null $label {
         get {
             /** @var mixed $value */
             $value = $this->values['label'] ?? null;
@@ -132,7 +132,7 @@ final class FieldConfig extends Configuration
                 $value === null
                     || $value === false
                     || is_string($value)
-                    || $value instanceof Html
+                    || $value instanceof HtmlStringable
                     || $value instanceof Closure,
                 'Field text retains a supported text or deferred value.',
             );
@@ -142,7 +142,7 @@ final class FieldConfig extends Configuration
     }
 
     /** The configured help setting. */
-    public string|Html|Closure|false|null $help {
+    public string|HtmlStringable|Closure|false|null $help {
         get {
             /** @var mixed $value */
             $value = $this->values['help'] ?? null;
@@ -150,7 +150,7 @@ final class FieldConfig extends Configuration
                 $value === null
                     || $value === false
                     || is_string($value)
-                    || $value instanceof Html
+                    || $value instanceof HtmlStringable
                     || $value instanceof Closure,
                 'Field text retains a supported text or deferred value.',
             );
@@ -171,13 +171,13 @@ final class FieldConfig extends Configuration
     }
 
     /** Return configuration with an explicit label setting. */
-    public function label(string|Html|Closure|false|null $value): static
+    public function label(string|HtmlStringable|Closure|false|null $value): static
     {
         return $this->changed('label', $value);
     }
 
     /** Return configuration with an explicit help setting. */
-    public function help(string|Html|Closure|false|null $value): static
+    public function help(string|HtmlStringable|Closure|false|null $value): static
     {
         return $this->changed('help', $value);
     }

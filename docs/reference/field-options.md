@@ -110,11 +110,12 @@ format milliseconds. Set or clear the step through `attributes(['step' => ...])`
 
 | Setter | Behavior |
 | --- | --- |
-| `label(string\|Html\|Closure\|false\|null)` | Null infers a humanized label; false suppresses it. Groups use a legend. |
-| `help(string\|Html\|Closure\|false\|null)` | Nonempty text renders associated help; false/null omit it. |
+| `label(string\|HtmlStringable\|Closure\|false\|null)` | Null infers a humanized label; false suppresses it. Groups use a legend. |
+| `help(string\|HtmlStringable\|Closure\|false\|null)` | Nonempty text renders associated help; false/null omit it. |
 | `errors(bool = true)` | Enable inline feedback, summary entries, and generated error descriptions. |
 
-Ordinary text is escaped; trusted HTML requires `FormCompose\Rendering\Html`.
+Ordinary text is escaped; trusted HTML uses `Cake\View\HtmlString` or another
+implementation of `Cake\View\HtmlStringable`.
 Call CakePHP translation functions in templates or blueprint hooks:
 
 ```php
@@ -127,7 +128,7 @@ echo $form->control('email')
 
 Use zero-argument label/help closures when a reusable config must evaluate text
 later. They resolve once per field snapshot after overrides merge and return
-string, Html, false, or null. Call CakePHP's translation functions inside the
+string, `HtmlStringable`, false, or null. Call CakePHP's translation functions inside the
 closure for deferred translation. See [translation timing](/blueprint-reference#translation).
 
 ## Constraints and state
@@ -183,7 +184,7 @@ echo $form->control('audience')->choices([
 ]);
 ```
 
-Labels are escaped unless wrapped in trusted `Html`. Lazy choice iterables are
+Labels are escaped unless wrapped in trusted `HtmlString`. Lazy choice iterables are
 consumed when rendering. An explicit non-choice type retains its type and does not
 consume those iterators. Backed enum classes supply cases in declaration order;
 iterable keys do not replace case backing values. Pure enums are rejected.

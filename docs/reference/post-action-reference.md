@@ -31,7 +31,7 @@ Omitting the URL for `postLink()` uses the current request target. Managed
 attributes such as `href`, `formaction`, and `formmethod` cannot redirect the
 protected action. Set button name, value, and disabled state with typed setters;
 those keys are rejected in `attributes()`. An action configuration containing
-button-only state is also rejected by `postLink()`. Supplied labels are escaped unless wrapped in `Html`.
+button-only state is also rejected by `postLink()`. Supplied labels are escaped unless wrapped in `HtmlString`.
 
 ```php
 <?= $this->Form

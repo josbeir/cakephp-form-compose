@@ -3,12 +3,12 @@ declare(strict_types=1);
 
 namespace FormCompose\Test\TestCase\Rendering;
 
+use Cake\View\HtmlStringable;
 use FormCompose\Binding\FormBinding;
 use FormCompose\Blueprint\BlueprintFactory;
 use FormCompose\Configuration\FormConfig;
 use FormCompose\Form\FormSession;
 use FormCompose\Form\PostAction;
-use FormCompose\Rendering\Html;
 use FormCompose\Rendering\PhpRenderer;
 use FormCompose\Rendering\PostActionRenderer;
 use FormCompose\Rendering\RenderContext;
@@ -71,7 +71,7 @@ class PostActionRendererTest extends FormTestCase
                         ->bind(),
                 ) extends PostActionRenderer {
                     protected function trigger(
-                        string|Html $label,
+                        string|HtmlStringable $label,
                         PostAction $action,
                         FormSession $form,
                         RenderContext $rendering,

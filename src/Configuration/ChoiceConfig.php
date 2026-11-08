@@ -3,22 +3,24 @@ declare(strict_types=1);
 
 namespace FormCompose\Configuration;
 
+use Cake\View\HtmlStringable;
 use FormCompose\Rendering\Attributes;
-use FormCompose\Rendering\Html;
 
 /** Immutable authoring metadata for an individual select, radio, or checkbox choice. */
 final readonly class ChoiceConfig
 {
     /** Start immutable fluent metadata for one submitted choice value. */
-    public static function builder(mixed $value, string|Html|Unspecified|null $label = Unspecified::Value): self
-    {
+    public static function builder(
+        mixed $value,
+        string|HtmlStringable|Unspecified|null $label = Unspecified::Value,
+    ): self {
         return new self($value, $label);
     }
 
     /** @param array<string, mixed> $attributes Per-choice integration attributes. */
     public function __construct(
         public mixed $value,
-        public string|Html|Unspecified|null $label = Unspecified::Value,
+        public string|HtmlStringable|Unspecified|null $label = Unspecified::Value,
         public array $attributes = [],
         public ?string $id = null,
     ) {
@@ -38,7 +40,7 @@ final readonly class ChoiceConfig
     }
 
     /** Return a choice with explicit text, including an intentionally blank label. */
-    public function label(string|Html|null $label): self
+    public function label(string|HtmlStringable|null $label): self
     {
         return clone($this, ['label' => $label]);
     }

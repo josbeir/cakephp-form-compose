@@ -6,7 +6,6 @@ namespace FormCompose\Test\TestCase\Rendering;
 use Cake\Form\FormProtector;
 use Cake\View\Form\ArrayContext;
 use FormCompose\Configuration\ButtonConfig;
-use FormCompose\Rendering\Html;
 use FormCompose\Rendering\PhpRenderer;
 use FormCompose\Rendering\Theme;
 use FormCompose\Test\Fixture\Authoring\CommentsForm;
@@ -16,6 +15,7 @@ use FormCompose\Test\Fixture\RecordingRenderer;
 use FormCompose\Test\FormTestCase;
 use InvalidArgumentException;
 use RuntimeException;
+use function Cake\View\html;
 
 /** Exercises complete-form layouts through public rendering and protection APIs. */
 class FormLayoutTest extends FormTestCase
@@ -215,7 +215,7 @@ class FormLayoutTest extends FormTestCase
         static::assertSame(
             1.0,
             $this->xpath(
-                $helper->form()->blueprint(TitleForm::class)->submit(new Html('<strong>Save</strong>'))->render(),
+                $helper->form()->blueprint(TitleForm::class)->submit(html('<strong>Save</strong>'))->render(),
             )->evaluate('count(//button/strong[text()="Save"])'),
         );
     }

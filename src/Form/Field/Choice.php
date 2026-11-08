@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace FormCompose\Form\Field;
 
+use Cake\View\HtmlStringable;
 use FormCompose\Rendering\Attributes;
-use FormCompose\Rendering\Html;
 
 /**
  * Holds template data for one select option, radio/checkbox choice, or choice group.
@@ -23,7 +23,7 @@ final readonly class Choice
      */
     public function __construct(
         public string $kind,
-        public string|Html $label,
+        public string|HtmlStringable $label,
         public Attributes $attributes,
         public array $children = [],
         public array $presentation = [],

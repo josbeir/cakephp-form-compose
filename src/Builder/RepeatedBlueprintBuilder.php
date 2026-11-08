@@ -3,10 +3,10 @@ declare(strict_types=1);
 
 namespace FormCompose\Builder;
 
+use Cake\View\HtmlStringable;
 use Closure;
 use FormCompose\Blueprint\RepeatedDefinition;
 use FormCompose\Configuration\EmbedConfig;
-use FormCompose\Rendering\Html;
 
 /**
  * Stages a repeated child, selecting final keys before compiling any row hooks.
@@ -15,7 +15,7 @@ use FormCompose\Rendering\Html;
 class RepeatedBlueprintBuilder extends ConfigurationBuilder
 {
     /** Set label on this mutable builder. */
-    public function label(string|Html|null $value): static
+    public function label(string|HtmlStringable|null $value): static
     {
         $this->configuration = $this->config()->label($value);
 

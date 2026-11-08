@@ -92,7 +92,7 @@ $form->embedMany('comments', 'comment')
 <?php
 declare(strict_types=1);
 
-use FormCompose\Rendering\Html;
+use Cake\View\HtmlString;
 
 /**
  * @var \FormCompose\Blueprint\RepeatedView $embed
@@ -101,7 +101,7 @@ use FormCompose\Rendering\Html;
  */
 ?>
 <section<?= $attributes ?>>
-    <h2><?= Html::text($embed->label()) ?></h2>
+    <h2><?= HtmlString::render($embed->label()) ?></h2>
     <?= $embed->errors() ?>
     <?php foreach ($rows as $row): ?>
         <article class="comment-row">

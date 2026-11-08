@@ -5,9 +5,9 @@ namespace FormCompose\Test\TestCase\Configuration;
 
 use FormCompose\Configuration\FieldConfig;
 use FormCompose\Configuration\FormConfig;
-use FormCompose\Rendering\Html;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use function Cake\View\html;
 
 /** Checks named configuration and canonical template selection independently of discovery metadata. */
 class FieldConfigTest extends TestCase
@@ -47,7 +47,7 @@ class FieldConfigTest extends TestCase
 
     public function testNamedConfigurationAndFluentOverridesPreserveExplicitValues(): void
     {
-        $help = new Html('<strong>Trusted help</strong>');
+        $help = html('<strong>Trusted help</strong>');
         $original = new FieldConfig(type: 'text', label: 'Original', help: 'Original');
         $field = $original->type('email')
             ->label(false)

@@ -7,6 +7,7 @@ use Cake\View\Form\ContextFactory;
 use Cake\View\Form\ContextInterface;
 use Cake\View\Helper;
 use Cake\View\Helper\HtmlHelper;
+use Cake\View\HtmlStringable;
 use FormCompose\Binding\FormBinding;
 use FormCompose\Binding\TypeMap;
 use FormCompose\Blueprint\BlueprintFactory;
@@ -19,7 +20,6 @@ use FormCompose\Configuration\ActionConfig;
 use FormCompose\Configuration\FormConfig;
 use FormCompose\Form\FormIds;
 use FormCompose\Form\FormSession;
-use FormCompose\Rendering\Html;
 use FormCompose\Rendering\PostActionRenderer;
 use FormCompose\Rendering\RenderContext;
 use FormCompose\Rendering\RendererInterface;
@@ -93,7 +93,7 @@ class FormHelper extends Helper
      *
      */
     public function postButton(
-        string|Html $label,
+        string|HtmlStringable $label,
         array|string $url,
         ?ActionConfig $config = null,
         Theme|string|null $theme = null,
@@ -119,7 +119,7 @@ class FormHelper extends Helper
      *
      */
     public function postLink(
-        string|Html $label,
+        string|HtmlStringable $label,
         array|string|null $url = null,
         ?ActionConfig $config = null,
         Theme|string|null $theme = null,

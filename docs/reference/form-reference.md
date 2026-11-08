@@ -75,7 +75,7 @@ instances, including those created by `FormConfig::builder()`:
 | `blueprint(?string)` | Append reusable field defaults and body declarations by alias or class. Calls accumulate in order; null clears the selection. |
 | `theme(Theme\|null)`, `renderer(?RendererInterface)` | Per-form rendering collaborators. |
 | `errorSummary(bool\|SummaryConfig = true)` | Configure the complete form's summary. |
-| `submit(string\|Html\|false\|null, ?ButtonConfig)` | Configure the complete form's action; null uses translated Submit. |
+| `submit(string\|HtmlStringable\|false\|null, ?ButtonConfig)` | Configure the complete form's action; null uses translated Submit. |
 | `withoutSubmit()` | Omit that action. |
 | `submitConfig(ButtonConfig)` | Configure its presentation and native button state. |
 
@@ -232,11 +232,11 @@ echo $form->submit('Save')
     ->attributes(['class' => 'button']);
 ```
 
-`submit(string|Html $label, ButtonConfig|null $config = null): ButtonBuilder` creates
+`submit(string|HtmlStringable $label, ButtonConfig|null $config = null): ButtonBuilder` creates
 a renderable button. Setters include `type(string)`, `name(?string)`,
 `value(mixed)`, `disabled(bool = true)`, and common presentation methods.
 Named enabled buttons participate in the submission contract after successful
-rendering. Ordinary labels are escaped; trusted markup requires `Html`.
+rendering. Ordinary labels are escaped; trusted markup requires `HtmlString`.
 
 ## unlock() {#unlock}
 
@@ -310,7 +310,7 @@ declare(strict_types=1);
  * @var \FormCompose\Configuration\ButtonConfig $submitConfig
  * @var string $summary
  * @var string $body
- * @var string|\FormCompose\Rendering\Html|false $submit
+ * @var string|\Cake\View\HtmlStringable|false $submit
  */
 ?>
 <?= $summary ?>
