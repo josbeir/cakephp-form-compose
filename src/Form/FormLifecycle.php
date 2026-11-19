@@ -114,13 +114,17 @@ class FormLifecycle
     }
 
     /**
-     * Register an enabled submit button as an optional submitted control.
+     * Register a successfully rendered named button as an optional submitted control.
      */
     public function button(Attributes $attributes): void
     {
         $this->assertOpen();
         $type = strtolower((string)($attributes->values['type'] ?? 'submit'));
-        if (!$attributes->has('disabled') && !in_array($type, ['button', 'reset'], true) && $attributes->has('name')) {
+        if ($attributes->has('disabled') || in_array($type, ['button', 'reset'], true)) {
+            return;
+        }
+
+        if (isset($attributes->values['name'])) {
             $this->protection->optional((string)$attributes->values['name']);
         }
     }
