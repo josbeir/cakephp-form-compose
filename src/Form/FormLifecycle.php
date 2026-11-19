@@ -114,13 +114,13 @@ class FormLifecycle
     }
 
     /**
-     * Register a successfully rendered named button as an optional submitted control.
+     * Stage a successfully rendered named button for overlap checks and optional submission.
      */
     public function button(Attributes $attributes): void
     {
         $this->assertOpen();
         if (isset($attributes->values['name'])) {
-            $this->protection->optional((string)$attributes->values['name']);
+            $this->protection->button((string)$attributes->values['name']);
         }
     }
 
@@ -128,6 +128,7 @@ class FormLifecycle
      * Prepare final tokens without closing the lifecycle before templates succeed.
      *
      * @return list<\FormCompose\Rendering\Attributes>
+     * @throws \InvalidArgumentException If a button name overlaps protected inputs or infrastructure.
      */
     public function tokens(): array
     {
