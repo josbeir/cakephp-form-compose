@@ -11,12 +11,12 @@ use FormCompose\View\Helper\FormHelper;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-/** Rejects unroutable action targets before opening or signing a form. */
+/** Keeps default submissions on the current document and validates explicit action targets. */
 class ActionUrlTest extends FormTestCase
 {
     /** Default actions remain local even when an incoming path resembles a host. */
     #[DataProvider('requestPaths')]
-    public function testDefaultActionsStayOnTheCurrentOrigin(string $path, ?string $expected): void
+    public function testDefaultActionsStayOnTheCurrentOrigin(string $path, string $expected, string $mode): void
     {
         $request = ServerRequestFactory::fromGlobals([
             'REQUEST_URI' => $path . '?next=%2Fhome',
@@ -26,17 +26,14 @@ class ActionUrlTest extends FormTestCase
         ])->withAttribute('formTokenData', [])->withAttribute('csrfToken', 'csrf-secret');
         $helper = new FormHelper(new View($request));
         $builder = $helper->form();
-        if ($expected === null) {
+        if ($mode === 'omitted') {
             $builder = $builder->url(false);
         }
 
         $form = $builder->bind();
         $html = $form->open() . $form->control('record.id')->type('hidden')->value('42')->render() . $form->close();
         $xpath = $this->xpath($html);
-        static::assertSame(
-            $expected === null ? '' : $expected . '?next=%2Fhome',
-            $xpath->evaluate('string(//form/@action)'),
-        );
+        static::assertSame(0.0, $xpath->evaluate('count(//form/@action)'));
         static::assertSame('csrf-secret', $xpath->evaluate('string(//input[@name="_csrfToken"]/@value)'));
         $payload = [
             'record' => ['id' => '42'],
@@ -47,21 +44,28 @@ class ActionUrlTest extends FormTestCase
             ],
         ];
         $session = $request->getSession()->id();
-        static::assertTrue(new FormProtector()->validate($payload, ($expected ?? $path) . '?next=%2Fhome', $session));
+        static::assertTrue(new FormProtector()->validate($payload, $expected . '?next=%2Fhome', $session));
+        static::assertFalse(new FormProtector()->validate($payload, '/different', $session));
         $payload['record']['id'] = '999';
-        static::assertFalse(new FormProtector()->validate($payload, ($expected ?? $path) . '?next=%2Fhome', $session));
+        static::assertFalse(new FormProtector()->validate($payload, $expected . '?next=%2Fhome', $session));
     }
 
-    /** @return array<string, array{string, ?string}> Incoming paths and browser submission targets. */
+    /** @return array<string, array{string, string, string}> Request paths retain their browser submission targets. */
     public static function requestPaths(): array
     {
-        return [
+        $cases = [];
+        foreach ([
             'ordinary' => ['/articles/save', '/articles/save'],
-            'network path' => ['//evil.example/login', '/evil.example/login'],
-            'extra slashes' => ['///evil.example/login', '/evil.example/login'],
+            'network path' => ['//evil.example/login', '//evil.example/login'],
+            'extra slashes' => ['///evil.example/login', '///evil.example/login'],
             'backslash' => ['/\\evil.example/login', '/%5Cevil.example/login'],
-            'omitted action' => ['//evil.example/login', null],
-        ];
+        ] as $label => [$path, $expected]) {
+            foreach (['default', 'omitted'] as $mode) {
+                $cases[$label . ' ' . $mode] = [$path, $expected, $mode];
+            }
+        }
+
+        return $cases;
     }
 
     public function testAnInvalidExternalPortCannotBecomeASignedFormAction(): void

@@ -37,7 +37,7 @@ class FormConstructionTest extends FormTestCase
         static::assertStringNotContainsString(' action=', $current->open());
         $current->close();
         $default = $helper->form()->bind();
-        static::assertStringContainsString('action="/articles/save"', $default->open());
+        static::assertStringNotContainsString(' action=', $default->open());
         $default->close();
     }
 

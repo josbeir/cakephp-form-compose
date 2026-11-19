@@ -12,10 +12,9 @@ use InvalidArgumentException;
  * Resolves both the form action attribute and the URL used for its security token.
  *
  * FormConstruction passes route arrays or URL strings through CakePHP routing.
- * An omitted URL uses the current request target; url => false omits the action
- * attribute. Default actions normalize leading slashes and escape backslashes so
- * browsers cannot interpret request paths as cross-origin URLs. The security URL
- * retains the resulting submission path and query string.
+ * An omitted URL or url => false omits the action attribute, letting the browser
+ * submit to the current document. The security URL retains the URI's path and
+ * query without interpreting a leading double slash as a network-path URL.
  */
 final class ActionUrl
 {
@@ -29,14 +28,9 @@ final class ActionUrl
         $url = $config->url;
         if ($url === null || $url === false) {
             $uri = $binding->request->getUri();
-            $path = $uri->getPath();
-            if ($url === null) {
-                $path = '/' . ltrim(str_replace('\\', '%5C', $path), '/');
-            }
+            $signed = $uri->getPath() . ($uri->getQuery() !== '' ? '?' . $uri->getQuery() : '');
 
-            $signed = $path . ($uri->getQuery() !== '' ? '?' . $uri->getQuery() : '');
-
-            return ['attribute' => $url === false ? null : $signed, 'signed' => $signed];
+            return ['attribute' => null, 'signed' => $signed];
         }
 
         $action = Router::url($url);

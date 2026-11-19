@@ -27,7 +27,7 @@ new configs.
 | `name(?string)`, `value(mixed)`, `disabled(bool = true)` | Post buttons only: optional submitted identity and native disabled state. |
 | `template()`, `partTemplate()`, `variant()`, `templateData()` | Shared trigger presentation. |
 
-Omitting the URL for `postLink()` uses the current request target. Managed
+Omitting the URL for `postLink()` omits the form's `action`, submitting to the current document URL. Managed
 attributes such as `href`, `formaction`, and `formmethod` cannot redirect the
 protected action. Set button name, value, and disabled state with typed setters;
 those keys are rejected in `attributes()`. An action configuration containing
