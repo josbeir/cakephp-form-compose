@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace FormCompose\Test\TestCase\Form;
 
 use Cake\Form\FormProtector;
+use FormCompose\Configuration\ButtonConfig;
 use FormCompose\Test\FormTestCase;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -48,6 +49,63 @@ class ButtonOverlapSecurityTest extends FormTestCase
             'association' => ['records.0.id', 'id'],
             'shared segment' => ['record.id', 'other[id]'],
         ];
+    }
+
+    /** Native non-submitting buttons can share field names without changing protection. */
+    #[DataProvider('nonSubmittingButtons')]
+    public function testNonSubmittingButtonsDoNotParticipateInOverlapValidation(
+        ButtonConfig $config,
+        string $name,
+        string $order,
+    ): void {
+        $helper = $this->helper(attributes: ['formTokenData' => []]);
+        $form = $helper->form()->bind();
+        $html = $form->open();
+        if ($order === 'button-first') {
+            $html .= $form->submit('Action')->apply($config)->name($name)->render();
+        }
+
+        $html .= $form->control('title')->render();
+        $html .= $form->control('record.id')->type('hidden')->value('42')->render();
+        if ($order === 'field-first') {
+            $html .= $form->submit('Action')->apply($config)->name($name)->render();
+        }
+
+        $html .= $form->close();
+        $xpath = $this->xpath($html);
+        $tokens = [];
+        foreach (['fields', 'unlocked', 'debug'] as $key) {
+            $value = $xpath->evaluate('string(//input[@name="_Token[' . $key . ']"]/@value)');
+            static::assertIsString($value);
+            $tokens[$key] = $value;
+        }
+
+        static::assertSame('', $tokens['unlocked']);
+        $payload = ['title' => 'Edited', 'record' => ['id' => '42'], '_Token' => $tokens];
+        $session = $helper->getView()->getRequest()->getSession()->id();
+        static::assertTrue(new FormProtector()->validate($payload, '/articles/save', $session));
+        static::assertFalse(new FormProtector()->validate($payload + ['injected' => '1'], '/articles/save', $session));
+        $payload['record']['id'] = '999';
+        static::assertFalse(new FormProtector()->validate($payload, '/articles/save', $session));
+    }
+
+    /** @return array<string, array{\FormCompose\Configuration\ButtonConfig, string, string}> Inert controls and overlapping names. */
+    public static function nonSubmittingButtons(): array
+    {
+        $cases = [];
+        foreach ([
+            'reset' => ButtonConfig::builder()->type('reset'),
+            'ordinary' => ButtonConfig::builder()->type('button'),
+            'disabled submit' => ButtonConfig::builder()->disabled(true),
+        ] as $kind => $config) {
+            foreach (['title', 'id', '_Token[fields]'] as $name) {
+                foreach (['button-first', 'field-first'] as $order) {
+                    $cases[$kind . ' ' . $name . ' ' . $order] = [$config, $name, $order];
+                }
+            }
+        }
+
+        return $cases;
     }
 
     /** Automatic unlocks must also leave the form infrastructure intact. */
