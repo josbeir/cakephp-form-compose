@@ -29,6 +29,9 @@ class FormProtection
     /** @var list<\FormCompose\Form\Field\Submission> Successfully rendered inputs awaiting token generation. */
     protected array $submissions = [];
 
+    /** @var list<string> Optional submit names checked against the completed form before unlocking. */
+    protected array $buttons = [];
+
     /**
      * Capture the current request without starting a session or registering inputs.
      */
@@ -60,7 +63,7 @@ class FormProtection
     }
 
     /**
-     * Explicitly unlocked paths and optional named buttons may vary or be omitted.
+     * Explicitly unlocked paths may vary or be omitted.
      */
     public function optional(string $name): void
     {
@@ -68,9 +71,18 @@ class FormProtection
     }
 
     /**
+     * Stage automatic button unlocks separately from explicitly unlocked fields.
+     */
+    public function button(string $name): void
+    {
+        $this->buttons[] = str_replace(['[', ']'], ['.', ''], $name);
+    }
+
+    /**
      * Return token values for hidden-field templates without embedding any markup.
      *
      * @return list<\FormCompose\Rendering\Attributes>
+     * @throws \InvalidArgumentException If an automatic button unlock would weaken field protection.
      */
     public function fields(FormState $state): array
     {
@@ -79,6 +91,11 @@ class FormProtection
         }
 
         $protector = clone $this->protector;
+        foreach ($this->buttons as $name) {
+            ButtonName::assertIndependent($name, $this->submissions);
+            $protector->unlockField($name);
+        }
+
         foreach ($this->submissions as $submission) {
             $protector->addField($submission->name, $submission->locked, $submission->value);
         }

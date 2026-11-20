@@ -15,8 +15,9 @@ use Throwable;
  * Tracks rendered input identities and atomic rendering registrations.
  *
  * FormLifecycle enforces form phases and multipart requirements. Definitions and
- * control batches stage successful inputs until rendering succeeds; failed renders
- * can be retried without retaining IDs or partial protection data. Inject through FormLifecycle.
+ * control batches stage successful inputs and buttons until rendering succeeds;
+ * failed renders can be retried without retaining IDs or partial protection data.
+ * Inject through FormLifecycle.
  */
 class InputRegistry
 {
@@ -25,6 +26,9 @@ class InputRegistry
 
     /** @var list<\FormCompose\Form\Field\Submission> Inputs staged until the outermost render succeeds. */
     protected array $pending = [];
+
+    /** @var list<string> Button names staged until the outermost render succeeds. */
+    protected array $pendingButtons = [];
 
     /** @var array<string, ?string> Successful control targets, included in render rollback. */
     protected array $targets = [];
@@ -84,6 +88,18 @@ class InputRegistry
     }
 
     /**
+     * Stage optional button submissions in the same transaction as rendered inputs.
+     */
+    public function button(string $name): void
+    {
+        if ($this->depth > 0) {
+            $this->pendingButtons[] = $name;
+        } else {
+            $this->protection->button($name);
+        }
+    }
+
+    /**
      * Reserve emitted DOM IDs, including feedback, options, and custom composite inputs.
      *
      * @param list<string> $ids Emitted IDs.
@@ -118,7 +134,7 @@ class InputRegistry
     }
 
     /**
-     * Commit inputs only after the outermost layout succeeds, or restore the snapshot.
+     * Commit inputs and buttons after the outermost layout succeeds, or restore the snapshot.
      *
      * @param \Closure(): string $render Definition or control-batch rendering operation.
      */
@@ -126,6 +142,7 @@ class InputRegistry
     {
         $rendered = $this->rendered;
         $pending = $this->pending;
+        $pendingButtons = $this->pendingButtons;
         $feedback = $this->feedback->entries();
         $references = $this->references->expectations();
         $targets = $this->targets;
@@ -138,6 +155,7 @@ class InputRegistry
         } catch (Throwable $throwable) {
             $this->rendered = $rendered;
             $this->pending = $pending;
+            $this->pendingButtons = $pendingButtons;
             $this->feedback->restore($feedback);
             $this->references->restore($references);
             $this->targets = $targets;
@@ -149,6 +167,11 @@ class InputRegistry
         if ($this->depth === 0) {
             $this->protection->register($this->pending);
             $this->pending = [];
+            foreach ($this->pendingButtons as $name) {
+                $this->protection->button($name);
+            }
+
+            $this->pendingButtons = [];
         }
 
         return $html;
