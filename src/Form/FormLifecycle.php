@@ -120,7 +120,7 @@ class FormLifecycle
     {
         $this->assertOpen();
         if (isset($attributes->values['name'])) {
-            $this->protection->button((string)$attributes->values['name']);
+            $this->inputs->button((string)$attributes->values['name']);
         }
     }
 
