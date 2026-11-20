@@ -124,7 +124,7 @@ class PostActionTest extends FormTestCase
     {
         $helper = $this->helper();
         $html = $helper->postLink(label: 'Here')->render();
-        static::assertStringContainsString('action="/articles/save"', $html);
+        static::assertStringNotContainsString(' action=', $html);
         $html = $helper->postButton(label: 'Other', url: '/explicit')
             ->method('patch')
             ->form(

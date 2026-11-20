@@ -62,7 +62,7 @@ instances, including those created by `FormConfig::builder()`:
 
 | Method | Contract |
 | --- | --- |
-| `url(array\|string\|false\|null)` | Cake route or URL; null uses the request URL, false omits the action. |
+| `url(array\|string\|false\|null)` | Cake route or URL; null and false omit `action`, submitting to the current document URL. |
 | `method(?string)` | GET, POST, PUT, PATCH, or DELETE. Null uses context defaults. Non-native methods use a POST method override. |
 | `id(?string)` | Explicit page-unique form ID; null generates one. |
 | `multipart(bool = true)` | Enable multipart uploads without changing the HTTP method. |

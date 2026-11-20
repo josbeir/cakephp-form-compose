@@ -12,8 +12,9 @@ use InvalidArgumentException;
  * Resolves both the form action attribute and the URL used for its security token.
  *
  * FormConstruction passes route arrays or URL strings through CakePHP routing.
- * An omitted URL uses the current request target; url => false omits the action
- * attribute. The security URL retains the target path and query string.
+ * An omitted URL or url => false omits the action attribute, letting the browser
+ * submit to the current document. The security URL retains the URI's path and
+ * query without interpreting a leading double slash as a network-path URL.
  */
 final class ActionUrl
 {
@@ -25,7 +26,14 @@ final class ActionUrl
     public static function resolve(FormBinding $binding, FormConfig $config): array
     {
         $url = $config->url;
-        $action = $url === null || $url === false ? $binding->request->getRequestTarget() : Router::url($url);
+        if ($url === null || $url === false) {
+            $uri = $binding->request->getUri();
+            $signed = $uri->getPath() . ($uri->getQuery() !== '' ? '?' . $uri->getQuery() : '');
+
+            return ['attribute' => null, 'signed' => $signed];
+        }
+
+        $action = Router::url($url);
         $parts = parse_url($action);
         if (!is_array($parts)) {
             throw new InvalidArgumentException('Invalid form action URL.');
@@ -33,6 +41,6 @@ final class ActionUrl
 
         $signed = ($parts['path'] ?? '/') . (isset($parts['query']) ? '?' . $parts['query'] : '');
 
-        return ['attribute' => $url === false ? null : $action, 'signed' => $signed];
+        return ['attribute' => $action, 'signed' => $signed];
     }
 }
