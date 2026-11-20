@@ -119,6 +119,11 @@ class FormLifecycle
     public function button(Attributes $attributes): void
     {
         $this->assertOpen();
+        $type = strtolower((string)($attributes->values['type'] ?? 'submit'));
+        if ($attributes->has('disabled') || in_array($type, ['button', 'reset'], true)) {
+            return;
+        }
+
         if (isset($attributes->values['name'])) {
             $this->inputs->button((string)$attributes->values['name']);
         }
